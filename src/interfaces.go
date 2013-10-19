@@ -1,6 +1,6 @@
 package main
 
 /* packet interface */
-type packet interface {
+type Packet interface {
 	GetPkid() int
 }

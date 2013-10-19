@@ -35,17 +35,8 @@ func main() {
 
 	handshake(conn);
 
-	buffer := make([]byte, 1024)
-
 	for {
-		conn.Read(buffer)
-		fmt.Printf(string(buffer))
-
-		// update
-		// create
-		// delete
-		// send byte
-
+		GetPacket(conn)
 	}
 }
 

@@ -3,7 +3,7 @@ package main
 /* packet interface */
 type Packet interface {
 	GetPkid() int
-	HandleInfo()
+	Handle()
 	Print()
 }
 

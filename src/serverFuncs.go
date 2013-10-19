@@ -24,24 +24,34 @@ func saveMasterFiles () {
 
 func handleConnection(conn net.conn) {
 	read := bufio.NewReader(conn)
-	
+
 	str, err := read.ReadString('\n')
 	if str != "swagfs" {
 		fmt.Println("Not our client. Disconnecting unkown connection.")
 		conn.Close()
 		return
 	}
-	fmt.Fprintf(conn, "hashtag\n") 
+	fmt.Fprintf(conn, "hashtag\n")
 	enc	:= gob.NewEncoder(conn)
-	mutex.Lock()	
+	mutex.Lock()
 	enc.Encode(masterFiles)
-	mutex.Unlock()	
-	
-	for ;
+	mutex.Unlock()
+	dec := got.NewDecoder(conn)
+
+	var p Packet
+
+	for {
+		dec.Decode(&p)
+		pkt <- p
+	}
 
 }
 
-func updateFile(
-	
+func handleIncomingPkts () {
+	for {
+		p <- pkt
+		p.Print()
+	}
+}
 
 

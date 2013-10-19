@@ -8,16 +8,17 @@ import (
 
 var masterFiles serverFileTree
 var mutex sync.Mutex
-var 
+var pkt chan Packet
 
 func main () {
 	ln, err := net.Listen("tcp", ":8080") 
 	
+	go handleIncomingPkts()
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
 			 continue
 		}
-		go handleConnection
+		go handleConnection()
 	}
 }

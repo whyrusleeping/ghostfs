@@ -1,11 +1,12 @@
 package main 
 import (
-	"fmt"
+	//"fmt"
 	"net"
 	"sync"
 //	"encoding/gob"
 //	"os"
 )
+
 
 var masterFiles ServerFileTree
 var mutex sync.Mutex

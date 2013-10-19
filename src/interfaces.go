@@ -6,4 +6,3 @@ type Packet interface {
 	Handle()
 	Print()
 }
-

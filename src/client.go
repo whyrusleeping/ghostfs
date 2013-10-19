@@ -13,6 +13,7 @@ func handshake(conn net.Conn){
 	response, _ := reader.ReadString('\n')
 
 	if response != "hashtag" {
+		fmt.Println(("[FAIL]")
 		fmt.Println("We have connected to somebody that isn't our server! Exiting...")
 		return
 	}
@@ -33,7 +34,9 @@ func main() {
 		return
 	}
 
+	fmt.Printf("%-30s", "Handshake...");
 	handshake(conn);
+	fmt.Printfln("[OK]");
 
 	for {
 		GetPacket(conn)

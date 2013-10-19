@@ -5,4 +5,3 @@ type Packet interface {
 	GetPkid() int
 	Handle()
 }
-

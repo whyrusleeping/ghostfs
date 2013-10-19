@@ -4,7 +4,7 @@ import (
 	"net"
 	"os"
 	"bufio"
-)
+
 
 func handshake(conn net.Conn){
 	fmt.Fprintf(conn, "swagfs\n")
@@ -38,8 +38,12 @@ func main() {
 
 	for {
 		conn.Read(buffer)
-
 		fmt.Printf(string(buffer))
+
+		// update
+		// create
+		// delete
+		// send byte
 
 	}
 }

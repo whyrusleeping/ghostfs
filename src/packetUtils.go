@@ -1,4 +1,5 @@
 package main
+
 import (
 	"fmt"
 	"net"
@@ -28,5 +29,3 @@ func idPacket(id int, pkt packet) {
 		packet.handleInfo()
 	}
 }
-
-func (c *clientPacket) 

@@ -27,7 +27,9 @@ func handleConnection(conn net.Conn) {
 	read := bufio.NewReader(conn)
 
 	str, _ := read.ReadString('\n')
+	str = str[:len(str)-1]
 	if str != "swagfs" {
+		//fmt.Println([]byte(str))
 		fmt.Println("Not our client. Disconnecting unkown connection.")
 		conn.Close()
 		return

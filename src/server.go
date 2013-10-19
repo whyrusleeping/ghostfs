@@ -16,8 +16,7 @@ var mutex sync.Mutex
 var pkt chan Packet
 
 func main () {
-	ln, _ := net.Listen("tcp", ":8080") 
-	
+	ln, _ := net.Listen("tcp", ":8080")
 	go handleIncomingPkts()
 	for {
 		conn, err := ln.Accept()

@@ -6,6 +6,6 @@ type PktServerFileTree struct {
 	ipaddr string // addr:port
 }
 
-func (p* PktClientInfo) GetPkid() int {
+func (p* PktServerFileTree) GetPkid() int {
 	return p.pktid;
 }

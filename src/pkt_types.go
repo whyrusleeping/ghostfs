@@ -1,7 +1,7 @@
 package main
 
 const (
-	PKT_FILE_CREATE          // PAT
+	PKT_FILE_CREATE = iota
 	PKT_FILE_UPDATE
 	PKT_FILE_DELETE
 	PKT_FILE_REQUEST_CHUNK

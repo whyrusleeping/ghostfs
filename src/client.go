@@ -1,10 +1,11 @@
 package main
+
 import (
 	"fmt"
 	"net"
 	"os"
 	"bufio"
-
+)
 
 func handshake(conn net.Conn){
 	fmt.Fprintf(conn, "swagfs\n")

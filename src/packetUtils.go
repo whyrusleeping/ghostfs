@@ -4,6 +4,7 @@ import (
 	"net"
 	"os"
 	"encoding/gob"
+	"time"
 )
 
 type connecInfo struct {
@@ -21,6 +22,13 @@ type clientPacket struct {
 /* packet type 2, containing info on all files */
 type serverFileTree struct {
 	files []serverFiles
+}
+
+type update struct {
+	path string
+	modTime time.Time
+	hash []byte
+	contents []byte
 }
 
 /* file info */
@@ -48,5 +56,3 @@ func idPacket(id int, pkt packet) {
 		packet.handleInfo()
 	}
 }
-
-func (c *clientPacket) 

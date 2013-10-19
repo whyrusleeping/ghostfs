@@ -9,14 +9,15 @@ SERVERFILES = server.go \
 			  serverFuncs.go \
 			  packetUtils.go \
 			  interfaces.go \
-			  general_types.go
+			  general_types.go \
+			  serverTree.go
 
 all: client server
 
 client:
 	go build -o ../client $(PACKETSTRUCTS) $(CLIENTFILES) 	
 
-server:
+server: $(PACKETSTRUCTS) $(SERVERFILES)
 	go build -o ../server $(PACKETSTRUCTS) $(SERVERFILES)
 
 clean:

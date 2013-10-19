@@ -6,7 +6,7 @@ import (
 /* packet type 1, containing client info */
 type PktServerFileTree struct {
 	pktid int
-	ipaddr string // addr:port
+	sft ServerFileTree
 }
 
 func (p* PktServerFileTree) GetPkid() int {

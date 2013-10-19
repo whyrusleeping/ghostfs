@@ -35,7 +35,8 @@ func handleConnection(conn net.Conn) {
 	fmt.Fprintf(conn, "hashtag\n")
 	enc	:= gob.NewEncoder(conn)
 	mutex.Lock()
-	enc.Encode(masterFiles)
+	sft := PktServerFileTree{PKT_SERVER_FILE_TREE, masterFiles}	
+	enc.Encode(sft)
 	mutex.Unlock()
 	dec := gob.NewDecoder(conn)
 
@@ -55,5 +56,4 @@ func handleIncomingPkts () {
 		p.Print()
 	}
 }
-
 

@@ -1,10 +1,8 @@
 package main
+
 import (
-	"fmt"
 	"net"
-	"os"
 	"encoding/gob"
-	"time"
 )
 
 type connecInfo struct {
@@ -13,20 +11,10 @@ type connecInfo struct {
 
 /* file info */
 
-func getPacket (conn net.Conn) {
-	decode = gob.NewDecoder(conn)
-	id := 0
-
-	var p packet
+func GetPacket (conn net.Conn) {
+	decode := gob.NewDecoder(conn)
+	var p Packet
 	decode.Decode(&p)
-	p.handleInfo()
-
+	p.Print()
+	p.Handle()
 }
-
-func idPacket(id int, pkt packet) {
-	if id == 1 {
-		packet.handleInfo()
-	}
-}
-
-func (c *clientPacket) 

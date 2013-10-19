@@ -4,5 +4,6 @@ package main
 type Packet interface {
 	GetPkid() int
 	HandleInfo()
+	Print()
 }
 

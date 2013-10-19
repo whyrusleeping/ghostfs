@@ -1,4 +1,7 @@
 package main
+import (
+	"fmt"
+)
 
 /* packet type 1, containing client info */
 type PktFileChunkMap struct {
@@ -9,4 +12,8 @@ type PktFileChunkMap struct {
 
 func (p* PktFileChunkMap) GetPkid() int {
 	return p.pktid;
+}
+
+func (p* PktFileChunkMap) Print() {
+	fmt.Println("I'm a PktFileChunkMap struct.")
 }

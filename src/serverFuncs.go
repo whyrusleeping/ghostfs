@@ -5,27 +5,28 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"os"
-	"sync"
+	//"sync"
+	"fmt"
 )
 
 func buildMasterFiles () {
-	configFile, err := os.Open("/.serverconfig")
+	configFile, _ := os.Open("/.serverconfig")
 	dec := json.NewDecoder(configFile)
 	dec.Decode(&masterFiles)
 	configFile.Close()
 }
 
 func saveMasterFiles () {
-	configFile, err := os.Open("/.serverconfig")
+	configFile, _ := os.Open("/.serverconfig")
 	enc := json.NewEncoder(configFile)
 	enc.Encode(&masterFiles)
 	configFile.Close()
 }
 
-func handleConnection(conn net.conn) {
+func handleConnection(conn net.Conn) {
 	read := bufio.NewReader(conn)
 
-	str, err := read.ReadString('\n')
+	str, _ := read.ReadString('\n')
 	if str != "swagfs" {
 		fmt.Println("Not our client. Disconnecting unkown connection.")
 		conn.Close()
@@ -36,7 +37,7 @@ func handleConnection(conn net.conn) {
 	mutex.Lock()
 	enc.Encode(masterFiles)
 	mutex.Unlock()
-	dec := got.NewDecoder(conn)
+	dec := gob.NewDecoder(conn)
 
 	var p Packet
 
@@ -48,8 +49,9 @@ func handleConnection(conn net.conn) {
 }
 
 func handleIncomingPkts () {
+	var p Packet
 	for {
-		p <- pkt
+		p = <-pkt
 		p.Print()
 	}
 }

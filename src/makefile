@@ -18,3 +18,6 @@ client:
 
 server:
 	go build -o ../server $(PACKETSTRUCTS) $(SERVERFILES)
+
+clean:
+	rm -f ../client ../server

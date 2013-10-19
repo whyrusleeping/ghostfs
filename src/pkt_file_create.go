@@ -1,4 +1,7 @@
 package main
+import (
+	"fmt"
+)
 
 /* packet type 1, containing client info */
 type PktFileCreate struct {
@@ -8,4 +11,8 @@ type PktFileCreate struct {
 
 func (p* PktFileCreate) GetPkid() int {
 	return p.pktid;
+}
+
+func (p* PktFileCreate) Print() {
+	fmt.Println("I'm a PktFileCreate struct.")
 }

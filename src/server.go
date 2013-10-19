@@ -1,17 +1,22 @@
 package main 
 import (
-	"fmt"
+	//"fmt"
 	"net"
-	"gob"
-	"os"
+	"sync"
+//	"encoding/gob"
+//	"os"
 )
 
-var masterFiles serverFileTree
+type ServerFileTree struct {
+	files []file
+}
+
+var masterFiles ServerFileTree
 var mutex sync.Mutex
 var pkt chan Packet
 
 func main () {
-	ln, err := net.Listen("tcp", ":8080") 
+	ln, _ := net.Listen("tcp", ":8080") 
 	
 	go handleIncomingPkts()
 	for {
@@ -19,6 +24,6 @@ func main () {
 		if err != nil {
 			 continue
 		}
-		go handleConnection()
+		go handleConnection(conn)
 	}
 }

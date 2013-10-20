@@ -1,22 +1,29 @@
 package main 
 import (
-	//"fmt"
+	"fmt"
 	"net"
 	"sync"
 //	"encoding/gob"
 //	"os"
 )
 
-type ServerFileTree struct {
-	files []file
-}
 
 var masterFiles ServerFileTree
 var mutex sync.Mutex
 var pkt chan Packet
 
 func main () {
-	ln, _ := net.Listen("tcp", ":8080")
+	rootpath := "/home/rae/.swagfs"
+	ln, _ := net.Listen("tcp", ":8080") 
+
+	mutex.Lock()
+	masterFiles := TraverseDir(rootpath)
+	mutex.Unlock()
+
+	for i:=0; i<len(masterFiles.files); i++ {
+		fmt.Println(masterFiles.files[i])
+	}
+	return	
 	go handleIncomingPkts()
 	for {
 		conn, err := ln.Accept()

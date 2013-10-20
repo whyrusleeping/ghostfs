@@ -7,7 +7,7 @@ import (
 type PktServerFileTree struct {
 	pktid int
 	client_id int
-	ipaddr string // addr:port
+	sft ServerFileTree
 }
 
 func (p* PktServerFileTree) GetPkid() int {

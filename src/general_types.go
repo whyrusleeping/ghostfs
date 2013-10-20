@@ -9,3 +9,8 @@ type file struct {
 	hash  string
 	mtime time.Time
 }
+
+type ServerFileTree struct {
+	files []file
+}
+

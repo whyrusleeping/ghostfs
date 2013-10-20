@@ -13,6 +13,9 @@ type PktFileDelete struct {
 func (p* PktFileDelete) GetPkid() int {
 	return p.pktid;
 }
+func (p* PktFileDelete) GetClientId() int {
+	return p.client_id;
+}
 
 func (p* PktFileDelete) Print() {
 	fmt.Println("I'm a PktFileDelete struct.")

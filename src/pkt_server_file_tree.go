@@ -14,6 +14,10 @@ func (p* PktServerFileTree) GetPkid() int {
 	return p.pktid;
 }
 
+func (p* PktServerFileTree) GetClientId() int {
+	return p.client_id;
+}
+
 func (p* PktServerFileTree) Print() {
 	fmt.Println("I'm a PktServerFileTree struct.")
 }

@@ -14,6 +14,10 @@ func (p* PktFileCreate) GetPkid() int {
 	return p.pktid;
 }
 
+func (p* PktFileCreate) GetClientId() int {
+	return p.client_id;
+}
+
 func (p* PktFileCreate) Print() {
 	fmt.Println("I'm a PktFileCreate struct.")
 }

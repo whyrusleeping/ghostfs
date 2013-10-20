@@ -14,6 +14,10 @@ func (p* PktClientInfo) GetPkid() int {
 	return p.pktid;
 }
 
+func (p* PktClientInfo) GetClientId() int {
+	return p.client_id;
+}
+
 func (p* PktClientInfo) Print() {
 	fmt.Println("I'm a PktClientInfo struct.")
 }

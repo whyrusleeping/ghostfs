@@ -16,6 +16,9 @@ type PktFileUpdate struct {
 func (p* PktFileUpdate) GetPkid() int {
 	return p.pktid;
 }
+func (p* PktFileUpdate) GetClientId() int {
+	return p.client_id;
+}
 
 func (p* PktFileUpdate) Print() {
 	fmt.Println("I'm a PktFileUpdate struct.")

@@ -5,17 +5,17 @@ import (
 
 /* packet type 1, containing client info */
 type PktClientInfo struct {
-	pktid int
-	client_id int
-	ipaddr string // addr:port
+	Pktid int
+	Client_id int
+	Ipaddr string // addr:port
 }
 
 func (p* PktClientInfo) GetPkid() int {
-	return p.pktid;
+	return p.Pktid;
 }
 
 func (p* PktClientInfo) GetClientId() int {
-	return p.client_id;
+	return p.Client_id;
 }
 
 func (p* PktClientInfo) Print() {

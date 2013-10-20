@@ -92,12 +92,14 @@ func BroadcastToAll(id int, p Packet) {
 			err := enc.Encode(p)
 			if err != nil { //list who has disconnected
 				fmt.Println("ERROR, KILL THE CLIENT!")
+				fmt.Println(err)
 				toRemove = append(toRemove, i)
 			}
 		}
 	}
 
-	for i = len(toRemove); i >= 0; i-- {
+	for i = len(toRemove)-1; i >= 0; i-- {
+		fmt.Println("RMEOVE")
 		clients = append(clients[:i], clients[i + 1:]...)
 	}
 }

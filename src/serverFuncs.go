@@ -77,6 +77,7 @@ func BroadcastToAll(id int, p Packet) {
 			}
 		}
 	}
+
 	for i = len(toRemove); i >= 0; i-- {
 		clients = append(clients[:i], clients[i + 1:]...)
 	}

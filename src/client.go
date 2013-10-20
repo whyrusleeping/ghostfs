@@ -8,7 +8,7 @@ import (
 	"bufio"
 )
 
-func handshake(conn net.Conn) error{
+func handshake(conn net.Conn) (int, error) {
 	fmt.Fprintf(conn, "swagfs\n")
 	reader := bufio.NewReader(conn)
 	response, _ := reader.ReadString('\n')
@@ -21,12 +21,13 @@ func handshake(conn net.Conn) error{
 		return 0, errors.New("We have connected to somebody that isn't our server! Exiting...")
 	}
 
-	response, _ := reader.ReadString('\n')
+	response, _ = reader.ReadString('\n')
 	response = response[:len(response)-1]
 	return int(id), nil
 }
 
-id int
+var clients []cclient
+var id int
 func main() {
 	fmt.Println("")
 

@@ -20,3 +20,9 @@ type client struct {
 	id int
 }
 
+type cclient struct {
+	conn net.Conn
+	id int
+	live bool
+	addr string
+}

@@ -28,12 +28,14 @@ func handleConnection(conn net.Conn) {
 	str, _ := read.ReadString('\n')
 	fmt.Println("Handshake...");
 	str = str[:len(str)-1]
+
 	if str != "swagfs" {
 		//fmt.Println([]byte(str))
 		fmt.Println("Not our client. Disconnecting unkown connection.")
 		conn.Close()
 		return
 	}
+
 	fmt.Fprintf(conn, "hashtag\n")
 
 	mutex.Lock()

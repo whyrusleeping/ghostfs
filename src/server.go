@@ -4,7 +4,7 @@ import (
 	"net"
 	"sync"
 //	"encoding/gob"
-//	"os"
+	"os"
 )
 
 
@@ -15,8 +15,8 @@ var count int
 var clients []client
 
 func main () {
-	rootpath := "/home/rae/.swagfs"
-	ln, _ := net.Listen("tcp", ":8080") 
+	rootpath := os.Args[1]
+	ln, _ := net.Listen("tcp", ":8080")
 	count = 1;
 	mutex.Lock()
 	masterFiles := TraverseDir(rootpath)
@@ -25,8 +25,9 @@ func main () {
 	for i:=0; i<len(masterFiles.files); i++ {
 		fmt.Println(masterFiles.files[i])
 	}
-	return	
+
 	go handleIncomingPkts()
+
 	for {
 		conn, err := ln.Accept()
 		if err != nil {

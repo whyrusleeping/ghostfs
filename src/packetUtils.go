@@ -2,7 +2,8 @@ package main
 
 import (
 	"net"
-	"encoding/gob"
+	"encoding/json"
+	"fmt"
 )
 
 type connecInfo struct {
@@ -12,9 +13,17 @@ type connecInfo struct {
 /* file info */
 
 func GetPacket (conn net.Conn) {
-	decode := gob.NewDecoder(conn)
+/*	b := make([]byte, 1)
+	for {
+		conn.Read(b)
+		fmt.Println(string(b))
+	}
+	*/
+	decode := json.NewDecoder(conn)
+	fmt.Println("GetPacket")
 	var p Packet
 	decode.Decode(&p)
+	fmt.Println("Have Packet")
 	p.Print()
 	p.Handle()
 }

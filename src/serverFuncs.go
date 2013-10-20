@@ -10,14 +10,14 @@ import (
 )
 
 func buildMasterFiles () {
-	configFile, _ := os.Open("/.serverconfig")
+	configFile, _ := os.Open(".serverconfig")
 	dec := json.NewDecoder(configFile)
 	dec.Decode(&masterFiles)
 	configFile.Close()
 }
 
 func saveMasterFiles () {
-	configFile, _ := os.Open("/.serverconfig")
+	configFile, _ := os.Open(".serverconfig")
 	enc := json.NewEncoder(configFile)
 	enc.Encode(&masterFiles)
 	configFile.Close()
@@ -25,8 +25,8 @@ func saveMasterFiles () {
 
 func handleConnection(conn net.Conn) {
 	read := bufio.NewReader(conn)
-
 	str, _ := read.ReadString('\n')
+	fmt.Println("Handshake...");
 	str = str[:len(str)-1]
 	if str != "swagfs" {
 		//fmt.Println([]byte(str))
@@ -38,15 +38,18 @@ func handleConnection(conn net.Conn) {
 
 	mutex.Lock()
 	count++
-	fmt.Fprintf(conn, "%d", count)
+	fmt.Fprintf(conn, "%d\n", count)
+
 	clients = append(clients, client{conn, count})
 	mutex.Unlock()
 
-	enc	:= gob.NewEncoder(conn)
-	mutex.Lock()
+	enc	:= json.NewEncoder(conn)
+	//mutex.Lock()
+
 	sft := PktServerFileTree{PKT_SERVER_FILE_TREE, 0, masterFiles}
+	//mutex.Unlock()
 	enc.Encode(sft)
-	mutex.Unlock()
+	fmt.Println("Done")
 	dec := gob.NewDecoder(conn)
 
 	var p Packet

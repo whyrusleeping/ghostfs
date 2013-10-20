@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"bufio"
+	"strconv"
 )
 
 func handshake(conn net.Conn) (int, error) {
@@ -20,10 +21,11 @@ func handshake(conn net.Conn) (int, error) {
 		//fmt.Println([]byte(response))
 		return 0, errors.New("We have connected to somebody that isn't our server! Exiting...")
 	}
-
+	fmt.Println("Done")
 	response, _ = reader.ReadString('\n')
 	response = response[:len(response)-1]
-	return int(id), nil
+	id,_ = strconv.Atoi(response); 
+	return id, nil
 }
 
 var clients []cclient
@@ -46,7 +48,7 @@ func main() {
 
 	fmt.Printf("%-30s", "Handshake...");
 	id, err = handshake(conn);
-
+	fmt.Println("Id: ", id);
 	if err != nil	{
 		fmt.Println(err);
 		return

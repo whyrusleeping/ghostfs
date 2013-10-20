@@ -6,13 +6,19 @@ import (
 
 func (p* PktClientInfo) Handle() {
 	fmt.Println("Handle ClientInfo")
+	// Push client into to array
 }
 
 func (p* PktServerFileTree) Handle() {
 	fmt.Println("Handle ServerFileTree")
+
+	for i:=0; i < len(p.sft.files); i++ {
+
+	}
 }
 
 func (p* PktFileCreate) Handle() {
+	// create a shadow
 	fmt.Println("Handle FileCreate")
 }
 

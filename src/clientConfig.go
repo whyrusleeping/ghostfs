@@ -1,10 +1,10 @@
-package main 
+package main
 import (
 )
 
 type clientConfig struct {
 	pathToRoot string
-	localFiles []file 
+	localFiles []file
 	serverIP connecInfo
 	clientIPs []connecInfo
 }

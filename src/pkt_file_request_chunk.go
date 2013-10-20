@@ -5,6 +5,7 @@ import (
 /* packet type 1, containing client info */
 type PktFileRequestChunk struct {
 	pktid int
+	client_id int
 	path string
 	chunk int
 }

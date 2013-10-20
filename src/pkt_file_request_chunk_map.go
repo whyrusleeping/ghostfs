@@ -17,3 +17,7 @@ func (p* PktFileRequestChunkMap) GetPkid() int {
 func (p* PktFileRequestChunkMap) Print() {
 	fmt.Println("I'm a PktFileRequestChunkMap struct.")
 }
+
+func (p* PktFileRequestChunkMap) getClientId() int {
+	return p.client_id
+}

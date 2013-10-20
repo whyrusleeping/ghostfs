@@ -18,7 +18,3 @@ func (p* PktClientInfo) Print() {
 	fmt.Println("I'm a PktClientInfo struct.")
 }
 
-func BroadCastToAll(count int, p Packet)
-
-BroadCastToAll(count, PktClientInfo{PKT_CLIENT_INFO, count, conn.LocalAddr().String()}
-

@@ -39,7 +39,7 @@ func handleConnection(conn net.Conn) {
 	mutex.Lock()
 	count++
 	fmt.Fprintf(conn, count)
-	clients = append(clients, conn)
+	clients = append(clients, client{conn, count})
 	mutex.Unlock()
 
 	enc	:= gob.NewEncoder(conn)
@@ -54,14 +54,13 @@ func handleConnection(conn net.Conn) {
 		dec.Decode(&p)
 		pkt <- p
 	}
-
 }
 
 func handleIncomingPkts () {
 	var p Packet
 	for {
-
 		p = <-pkt
+		BroadcastToAll(p.client_id, p)
 		p.Print()
 	}
 }

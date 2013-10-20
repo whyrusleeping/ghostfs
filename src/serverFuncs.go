@@ -38,13 +38,13 @@ func handleConnection(conn net.Conn) {
 
 	mutex.Lock()
 	count++
-	fmt.Fprintf(conn, count)
+	fmt.Fprintf(conn, "%d", count)
 	clients = append(clients, client{conn, count})
 	mutex.Unlock()
 
 	enc	:= gob.NewEncoder(conn)
 	mutex.Lock()
-	sft := PktServerFileTree{PKT_SERVER_FILE_TREE, masterFiles}
+	sft := PktServerFileTree{PKT_SERVER_FILE_TREE, 0, masterFiles}
 	enc.Encode(sft)
 	mutex.Unlock()
 	dec := gob.NewDecoder(conn)
@@ -60,7 +60,7 @@ func handleIncomingPkts () {
 	var p Packet
 	for {
 		p = <-pkt
-		BroadcastToAll(p.client_id, p)
+		BroadcastToAll(p.GetClientId(), p)
 		p.Print()
 	}
 }

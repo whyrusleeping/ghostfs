@@ -8,7 +8,7 @@ import (
 )
 
 
-var masterFiles ServerFileTree
+var MasterFiles ServerFileTree
 var mutex sync.Mutex
 var pkt chan Packet
 var count int
@@ -19,13 +19,15 @@ func main () {
 	ln, _ := net.Listen("tcp", ":8080")
 	count = 1;
 	mutex.Lock()
-	masterFiles := TraverseDir(rootpath)
+	MasterFiles = TraverseDir(rootpath)
 	mutex.Unlock()
-
-	for i:=0; i<len(masterFiles.files); i++ {
-		fmt.Println(masterFiles.files[i])
+	/*
+	for i:=0; i<len(MasterFiles.Files); i++ {
+		fmt.Println(MasterFiles.Files[i])
 	}
-
+	*/
+//	MasterFiles = ServerFileTree{}
+	fmt.Println("")
 	go handleIncomingPkts()
 
 	for {

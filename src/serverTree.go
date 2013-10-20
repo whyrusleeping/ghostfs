@@ -15,7 +15,7 @@ func TraverseDir(dir string) ServerFileTree {
 			h := md5.New()
 			h.Write(buf)
 			hashitself := h.Sum(nil)
-			sft.files = append(sft.files, file{path, string(hashitself), info.ModTime()})
+			sft.Files = append(sft.Files, file{path, string(hashitself), info.ModTime()})
 		}
 		return nil
 	})

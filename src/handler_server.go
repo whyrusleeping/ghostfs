@@ -11,8 +11,8 @@ func (p* PktClientInfo) Handle() {
 func (p* PktServerFileTree) Handle() {
 	fmt.Println("Handle ServerFileTree")
 
-	for i:=0; i < len(p.sft.files); i++ {
-
+	for i:=0; i < len(p.Files); i++ {
+		fmt.Println(p.Files[i])
 	}
 }
 

@@ -6,13 +6,13 @@ import (
 )
 
 type file struct {
-	path  string
-	hash  string
-	mtime time.Time
+	Path  string
+	Hash  string
+	Mtime time.Time
 }
 
 type ServerFileTree struct {
-	files []file
+	Files []file
 }
 
 type client struct {

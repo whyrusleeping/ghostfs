@@ -3,7 +3,7 @@ import (
 	"net"
 	"bufio"
 	"encoding/gob"
-	"encoding/json"
+	//"encoding/json"
 	"os"
 	//"sync"
 	"fmt"
@@ -11,15 +11,15 @@ import (
 
 func buildMasterFiles () {
 	configFile, _ := os.Open(".serverconfig")
-	dec := json.NewDecoder(configFile)
-	dec.Decode(&masterFiles)
+	dec := gob.NewDecoder(configFile)
+	dec.Decode(&MasterFiles)
 	configFile.Close()
 }
 
 func saveMasterFiles () {
 	configFile, _ := os.Open(".serverconfig")
-	enc := json.NewEncoder(configFile)
-	enc.Encode(&masterFiles)
+	enc := gob.NewEncoder(configFile)
+	enc.Encode(&MasterFiles)
 	configFile.Close()
 }
 
@@ -45,14 +45,25 @@ func handleConnection(conn net.Conn) {
 	clients = append(clients, client{conn, count})
 	mutex.Unlock()
 
-	enc	:= json.NewEncoder(conn)
+	enc	:= gob.NewEncoder(conn)
 	//mutex.Lock()
-
-	sft := PktServerFileTree{PKT_SERVER_FILE_TREE, 0, masterFiles}
+/*
+	for i:=0; i<len(MasterFiles.Files); i++ {
+		fmt.Println(MasterFiles.Files[i])
+	}
+	*/
+	sft := &PktServerFileTree{PKT_SERVER_FILE_TREE, 0, MasterFiles.Files}
+	fmt.Println(sft)
+	var pp Packet
+	pp = sft;
+	pp.Print();
 	//mutex.Unlock()
+	fmt.Fprintf(conn,"%d\n", PKT_SERVER_FILE_TREE);
 	enc.Encode(sft)
 	fmt.Println("Done")
 	dec := gob.NewDecoder(conn)
+
+	BroadcastToAll(count, &PktClientInfo{PKT_CLIENT_INFO, count, conn.LocalAddr().String()})
 
 	var p Packet
 	for {
@@ -73,11 +84,14 @@ func handleIncomingPkts () {
 func BroadcastToAll(id int, p Packet) {
 	i := 0
 	var toRemove []int
+	fmt.Println("Count: ", len(clients));
 	for i = 0; i < len(clients); i++ {
 		if clients[i].id != id {
+			fmt.Println("Sending to client ", i)
 			enc := gob.NewEncoder(clients[i].conn)
 			err := enc.Encode(p)
 			if err != nil { //list who has disconnected
+				fmt.Println("ERROR, KILL THE CLIENT!")
 				toRemove = append(toRemove, i)
 			}
 		}

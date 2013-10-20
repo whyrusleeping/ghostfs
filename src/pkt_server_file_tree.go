@@ -5,17 +5,18 @@ import (
 
 /* packet type 1, containing client info */
 type PktServerFileTree struct {
-	pktid int
-	client_id int
-	sft ServerFileTree
+	Pktid int
+	Client_id int
+	//Sft ServerFileTree
+	Files []file
 }
 
 func (p* PktServerFileTree) GetPkid() int {
-	return p.pktid;
+	return p.Pktid;
 }
 
 func (p* PktServerFileTree) GetClientId() int {
-	return p.client_id;
+	return p.Client_id;
 }
 
 func (p* PktServerFileTree) Print() {

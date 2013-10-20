@@ -35,7 +35,3 @@ func main () {
 		go handleConnection(conn)
 	}
 }
-
-//BroadCastToAll(count, PktClientInfo{PKT_CLIENT_INFO, count, conn.RemoteAddr() + "port")
-
-/* func BroadCastToAll(count int, p Packet)

@@ -18,6 +18,6 @@ func (p* PktFileRequestChunk) Print() {
 	fmt.Println("I'm a PktFileRequestChunk struct.")
 }
 
-func (p* PktFileRequestChunk) getClientId() int {
+func (p* PktFileRequestChunk) GetClientId() int {
 	return p.client_id
 }

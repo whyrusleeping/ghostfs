@@ -22,6 +22,3 @@ func (p* PktClientInfo) Print() {
 	fmt.Println("I'm a PktClientInfo struct.")
 }
 
-func (p* PktClientInfo) getClientId() {
-	return p.client_id
-}

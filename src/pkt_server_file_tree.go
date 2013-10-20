@@ -6,6 +6,7 @@ import (
 /* packet type 1, containing client info */
 type PktServerFileTree struct {
 	pktid int
+	client_id int
 	ipaddr string // addr:port
 }
 

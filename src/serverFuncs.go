@@ -35,15 +35,21 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 	fmt.Fprintf(conn, "hashtag\n")
+
+	mutex.Lock()
+	count++
+	fmt.Fprintf(conn, count)
+	clients = append(clients, conn)
+	mutex.Unlock()
+
 	enc	:= gob.NewEncoder(conn)
 	mutex.Lock()
-	sft := PktServerFileTree{PKT_SERVER_FILE_TREE, masterFiles}	
+	sft := PktServerFileTree{PKT_SERVER_FILE_TREE, masterFiles}
 	enc.Encode(sft)
 	mutex.Unlock()
 	dec := gob.NewDecoder(conn)
 
 	var p Packet
-
 	for {
 		dec.Decode(&p)
 		pkt <- p
@@ -54,8 +60,27 @@ func handleConnection(conn net.Conn) {
 func handleIncomingPkts () {
 	var p Packet
 	for {
+
 		p = <-pkt
 		p.Print()
 	}
 }
+
+func BroadcastToAll(id int, p Packet) {
+	i := 0
+	var toRemove []int
+	for i = 0; i < len(clients); i++ {
+		if clients[i].id != id {
+			enc := gob.NewEncoder(clients[i].conn)
+			err := enc.Encode(p)
+			if err != nil { //list who has disconnected
+				toRemove = append(toRemove, i)
+			}
+		}
+	}
+	for i = len(toRemove); i >= 0; i-- {
+		clients = append(clients[:i], clients[i + 1:]...)
+	}
+}
+
 

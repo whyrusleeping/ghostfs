@@ -2,6 +2,7 @@ package main
 
 import (
 	"time"
+	"net"
 )
 
 type file struct {
@@ -12,5 +13,10 @@ type file struct {
 
 type ServerFileTree struct {
 	files []file
+}
+
+type client struct {
+	conn net.Conn
+	id int
 }
 

@@ -2,7 +2,7 @@ package main
 import (
 	"net"
 	"bufio"
-	"encoding/gob"
+	//"encoding/gob"
 	"encoding/json"
 	"os"
 	//"sync"
@@ -50,7 +50,7 @@ func handleConnection(conn net.Conn) {
 	//mutex.Unlock()
 	enc.Encode(sft)
 	fmt.Println("Done")
-	dec := gob.NewDecoder(conn)
+	dec := jsond.NewDecoder(conn)
 
 	var p Packet
 	for {
@@ -73,7 +73,7 @@ func BroadcastToAll(id int, p Packet) {
 	var toRemove []int
 	for i = 0; i < len(clients); i++ {
 		if clients[i].id != id {
-			enc := gob.NewEncoder(clients[i].conn)
+			enc := json.NewEncoder(clients[i].conn)
 			err := enc.Encode(p)
 			if err != nil { //list who has disconnected
 				toRemove = append(toRemove, i)

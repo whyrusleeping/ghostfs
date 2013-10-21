@@ -29,7 +29,7 @@ func GetPacket (conn net.Conn) {
 	var p Packet
 	response, _ := reader.ReadString('\n')
 	response = response[:len(response)-1]
-	id,_ := strconv.Atoi(response); 
+	id,_ := strconv.Atoi(response);
 	fmt.Println("ID:", id)
 	switch id {
 		case PKT_FILE_CREATE:

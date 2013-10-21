@@ -10,16 +10,21 @@ import (
 	"fmt"
 )
 
-func fuckgo() {
-	_ = filepath.SplitList
-	_ = strings.Split
-}
-
 type swagfs struct {
 	pathfs.FileSystem
 	Root *Dir
+	cachedir string
 }
 
+func MakeSwag() *swagfs {
+	swag := &swagfs{FileSystem: pathfs.NewDefaultFileSystem()}
+	swag.Root = new(Dir)
+	swag.Root.name = ""
+	swag.Root.attr = new(fuse.Attr)
+	return swag
+}
+
+//Traverse the file tree and get the file specified
 func (fs *swagfs) GetEntry(path string) Entry {
 	fmt.Printf("calling get entry! %s\n", path)
 	if path == "" {

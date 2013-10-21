@@ -8,20 +8,20 @@ import (
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 )
 
+//Example program to run our fuse filesystem
 func main() {
 	flag.Parse()
 	if len(flag.Args()) < 1 {
 		log.Fatal("Usage:\n  hello MOUNTPOINT")
 	}
-	swag := &swagfs{FileSystem: pathfs.NewDefaultFileSystem()}
-	swag.Root = new(Dir)
-	swag.Root.name = "root"
-	swag.Root.attr = new(fuse.Attr)
-	swag.Root.Entries = append(swag.Root.Entries, MakeFile("coolfile"))
-	mydir := MakeDir("adir")
-	mydir.Entries = append(mydir.Entries, MakeFile("lamefile"))
-	swag.Root.Entries = append(swag.Root.Entries, mydir)
+
+	//Make our filesystem structure
+	swag := MakeSwag()
+
+	//Use it to create a file system interface
 	nfs := pathfs.NewPathNodeFs(swag, nil)
+
+	//Mount our filesystem
 	server, _, err := nodefs.MountFileSystem(flag.Arg(0), nfs, nil)
 	if err != nil {
 		log.Fatalf("Mount fail: %s\n", err)

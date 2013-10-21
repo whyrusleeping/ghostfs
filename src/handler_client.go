@@ -13,7 +13,6 @@ func (p* PktServerFileTree) Handle() {
 	fmt.Println("Handle ServerFileTree")
 	fmt.Println(len(p.Files))
 	for i:=0; i < len(p.Files); i++ {
-
 		fmt.Println(p.Files[i])
 	}
 }

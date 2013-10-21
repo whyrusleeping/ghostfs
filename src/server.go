@@ -1,33 +1,31 @@
-package main 
+package main
+
 import (
 	"fmt"
 	"net"
 	"sync"
-//	"encoding/gob"
 	"os"
 )
 
-
-var MasterFiles ServerFileTree
-var mutex sync.Mutex
+//TODO: maybe put this all in a struct?
+var MasterFiles *ServerFileTree
+var mutex sync.Mutex //TODO: mutexes are bad, lets somehow use a channel to sync stuff up
 var pkt chan Packet
 var count int
 var clients []client
 
 func main () {
-	rootpath := os.Args[1]
-	ln, _ := net.Listen("tcp", ":8080")
-	count = 1;
-	mutex.Lock()
-	MasterFiles = TraverseDir(rootpath)
-	mutex.Unlock()
-	/*
-	for i:=0; i<len(MasterFiles.Files); i++ {
-		fmt.Println(MasterFiles.Files[i])
+	if len(os.Args) < 2 {
+		fmt.Println("Must specify root path")
+		return
 	}
-	*/
-//	MasterFiles = ServerFileTree{}
-	fmt.Println("")
+	rootpath := os.Args[1]
+
+	ln, _ := net.Listen("tcp", ":8080")
+	count = 1
+
+	MasterFiles = TraverseDir(rootpath)
+
 	go handleIncomingPkts()
 
 	for {

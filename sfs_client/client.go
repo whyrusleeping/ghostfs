@@ -7,6 +7,7 @@ import (
 	"os"
 	"bufio"
 	"strconv"
+	"github.com/whyrusleeping/swagfs/sfs_types"
 )
 
 func handshake(conn net.Conn) (int, error) {
@@ -26,7 +27,7 @@ func handshake(conn net.Conn) (int, error) {
 	return id, nil
 }
 
-var clients []cclient
+var clients []types.Cclient
 var id int
 
 func main() {
@@ -57,7 +58,7 @@ func main() {
 
 	//Get and handle packets
 	for {
-		GetPacket(conn)
+		types.GetPacket(conn)
 	}
 }
 

@@ -5,14 +5,15 @@ import (
 	"net"
 	"sync"
 	"os"
+	"github.com/whyrusleeping/swagfs/sfs_types"
 )
 
 //TODO: maybe put this all in a struct?
-var MasterFiles *ServerFileTree
+var MasterFiles *types.ServerFileTree
 var mutex sync.Mutex //TODO: mutexes are bad, lets somehow use a channel to sync stuff up
-var pkt chan Packet
+var pkt chan types.Packet
 var count int
-var clients []client
+var clients []*types.Client
 
 func main () {
 	if len(os.Args) < 2 {
@@ -24,7 +25,11 @@ func main () {
 	ln, _ := net.Listen("tcp", ":8080")
 	count = 1
 
-	MasterFiles = TraverseDir(rootpath)
+	n := new(types.Node)
+	n.Name = "."
+	n.BuildTree(rootpath)
+
+	//MasterFiles = TraverseDir(rootpath)
 
 	go handleIncomingPkts()
 

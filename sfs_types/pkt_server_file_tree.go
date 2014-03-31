@@ -1,4 +1,4 @@
-package main
+package types
 import (
 	"fmt"
 )
@@ -8,7 +8,7 @@ type PktServerFileTree struct {
 	Pktid int
 	Client_id int
 	//Sft ServerFileTree
-	Files []file
+	Files []File
 }
 
 func (p* PktServerFileTree) GetPkid() int {

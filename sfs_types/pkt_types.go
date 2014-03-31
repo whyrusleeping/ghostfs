@@ -1,4 +1,4 @@
-package main
+package types
 
 const (
 	PKT_FILE_CREATE = iota

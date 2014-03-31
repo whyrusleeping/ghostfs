@@ -1,4 +1,4 @@
-package main
+package types
 
 /* packet interface */
 type Packet interface {

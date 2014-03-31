@@ -7,6 +7,7 @@ import (
 	"os"
 	//"sync"
 	"fmt"
+	"github.com/whyrusleeping/swagfs/sfs_types"
 )
 
 func buildMasterFiles () {
@@ -42,7 +43,7 @@ func handleConnection(conn net.Conn) {
 	count++
 	fmt.Fprintf(conn, "%d\n", count)
 
-	clients = append(clients, client{conn, count})
+	clients = append(clients, &types.Client{conn, count})
 	mutex.Unlock()
 
 	enc	:= gob.NewEncoder(conn)
@@ -52,20 +53,20 @@ func handleConnection(conn net.Conn) {
 		fmt.Println(MasterFiles.Files[i])
 	}
 	*/
-	sft := &PktServerFileTree{PKT_SERVER_FILE_TREE, 0, MasterFiles.Files}
+	sft := &types.PktServerFileTree{types.PKT_SERVER_FILE_TREE, 0, MasterFiles.Files}
 	fmt.Println(sft)
-	var pp Packet
+	var pp types.Packet
 	pp = sft;
 	pp.Print();
 	//mutex.Unlock()
-	fmt.Fprintf(conn,"%d\n", PKT_SERVER_FILE_TREE);
+	fmt.Fprintf(conn,"%d\n", types.PKT_SERVER_FILE_TREE);
 	enc.Encode(sft)
 	fmt.Println("Done")
 	dec := gob.NewDecoder(conn)
 
-	BroadcastToAll(count, &PktClientInfo{PKT_CLIENT_INFO, count, conn.LocalAddr().String()})
+	BroadcastToAll(count, &types.PktClientInfo{types.PKT_CLIENT_INFO, count, conn.LocalAddr().String()})
 
-	var p Packet
+	var p types.Packet
 	for {
 		dec.Decode(&p)
 		pkt <- p
@@ -73,7 +74,7 @@ func handleConnection(conn net.Conn) {
 }
 
 func handleIncomingPkts () {
-	var p Packet
+	var p types.Packet
 	for {
 		p = <-pkt
 		BroadcastToAll(p.GetClientId(), p)
@@ -81,14 +82,14 @@ func handleIncomingPkts () {
 	}
 }
 
-func BroadcastToAll(id int, p Packet) {
+func BroadcastToAll(id int, p types.Packet) {
 	i := 0
 	var toRemove []int
 	fmt.Println("Count: ", len(clients));
 	for i = 0; i < len(clients); i++ {
-		if clients[i].id != id {
+		if clients[i].Id != id {
 			fmt.Println("Sending to client ", i)
-			enc := gob.NewEncoder(clients[i].conn)
+			enc := gob.NewEncoder(clients[i].Conn)
 			err := enc.Encode(p)
 			if err != nil { //list who has disconnected
 				fmt.Println("ERROR, KILL THE CLIENT!")

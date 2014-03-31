@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"time"
 	"net"
 )
@@ -13,6 +14,12 @@ type file struct {
 
 type ServerFileTree struct {
 	Files []file
+}
+
+type Node struct {
+	Entries []*Node
+	Type os.FileMode
+	Name string
 }
 
 type client struct {

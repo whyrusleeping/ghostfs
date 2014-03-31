@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	"net"
@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-type connecInfo struct {
+type ConnecInfo struct {
 	ipaddr string //port and addr
 }
 

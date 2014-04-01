@@ -7,11 +7,11 @@ types:
 
 .PHONY: client
 client:
-	(cd sfs_client && go build -o ../client)
+	(cd sfs_client && go install .)
 
 .PHONY: server
 server:
-	(cd sfs_server && go build -o ../server)
+	(cd sfs_server && go install .)
 
 clean:
 	rm -f client server

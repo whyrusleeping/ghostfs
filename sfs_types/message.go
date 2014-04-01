@@ -20,4 +20,5 @@ type Message interface {
 
 type DirInfoMessage struct {
 	Inf *DirInfo
+	RelPath string
 }

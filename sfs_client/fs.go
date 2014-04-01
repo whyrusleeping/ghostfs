@@ -18,9 +18,7 @@ type swagfs struct {
 
 func MakeSwag() *swagfs {
 	swag := &swagfs{FileSystem: pathfs.NewDefaultFileSystem()}
-	swag.Root = new(Dir)
-	swag.Root.name = ""
-	swag.Root.attr = new(fuse.Attr)
+	swag.Root = MakeDir("")
 	return swag
 }
 

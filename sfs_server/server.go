@@ -58,7 +58,7 @@ func (s *SfsServer) SyncChan() {
 func (s *SfsServer) AddClient(c net.Conn) {
 	cl := s.NewClient(c)
 	go cl.Start()
-	cl.SendMessage(&sfs.DirInfoMessage{s.TreeRoot.GetDirInfo()})
+	cl.SendMessage(&sfs.DirInfoMessage{s.TreeRoot.GetDirInfo(),""})
 	s.NewClients <- cl
 }
 

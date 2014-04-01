@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"encoding/gob"
 	"github.com/whyrusleeping/swagfs/sfs_types"
-	"flag"
 	"log"
 	"github.com/hanwen/go-fuse/fuse/pathfs"
 	//"github.com/hanwen/go-fuse/fuse"
@@ -70,7 +69,7 @@ func main() {
 	nfs := pathfs.NewPathNodeFs(swag, nil)
 
 	//Mount our filesystem
-	server, _, err := nodefs.MountRoot(flag.Arg(0), nfs.Root(), nil)
+	server, _, err := nodefs.MountRoot(os.Args[3], nfs.Root(), nil)
 	if err != nil {
 		log.Fatalf("Mount fail: %s\n", err)
 	}
@@ -91,8 +90,15 @@ func main() {
 		switch m := m.(type) {
 			case sfs.DirInfoMessage:
 				fmt.Println("DirInfoMessage:")
-				for _,d := range m.Inf.Entries {
-					fmt.Println(d.Name)
+				e := swag.GetEntry(m.RelPath)
+				dir,ok := e.(*Dir)
+				if !ok {
+					fmt.Println("Recieved Dir info for non dir...")
+				} else {
+					for _,d := range m.Inf.Entries {
+						fmt.Println(d.Name)
+						dir.AddEntry(MakeEntry(d))
+					}
 				}
 			default:
 				fmt.Println("Unknown Type.")

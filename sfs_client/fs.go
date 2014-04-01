@@ -36,6 +36,11 @@ func (fs *swagfs) GetEntry(path string) Entry {
 	return e
 }
 
+func (fs *swagfs) Access(path string, mode uint32, context *fuse.Context) (code fuse.Status) {
+	fmt.Println("Access was called!")
+	code = 0
+	return
+}
 //Require the 'name' to be the full path
 func (fs *swagfs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
 	fmt.Printf("calling get attr: %s\n", name)
@@ -81,7 +86,7 @@ func (fs *swagfs) Open(name string, flags uint32, context *fuse.Context) (file n
 	if !ok {
 		return nil, fuse.ENOENT
 	}
-
+	fi.name = "john"
 	return nodefs.NewDataFile([]byte(name)), fuse.OK
 }
 

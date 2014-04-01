@@ -1,4 +1,4 @@
-package types
+package sfs
 
 /* packet interface */
 type Packet interface {

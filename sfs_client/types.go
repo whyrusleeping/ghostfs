@@ -1,9 +1,11 @@
 package main
 
 import (
+	"os"
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 	"fmt"
+	"github.com/whyrusleeping/swagfs/sfs_types"
 )
 
 //Everything in our filesystem is an 'Entry'
@@ -17,6 +19,19 @@ type Entry interface {
 type mEntry struct {
 	attr *fuse.Attr
 	name string
+}
+
+func MakeEntry(e *sfs.EntryInfo) Entry {
+	if (e.Mode & os.ModeDir) > 0 {
+		d := new(Dir)
+		d.name = e.Name
+		d.attr.Mode = uint32(e.Mode)
+		return d
+	}
+	f := new(File)
+	f.name = e.Name
+	f.attr.Mode = uint32(e.Mode)
+	return f
 }
 
 //Directory
@@ -37,7 +52,7 @@ func (d *Dir) AddEntry(e Entry) {
 		return
 	}
 	d.Entries = append(d.Entries, e)
-	d.attr.Nlink = len(d.Entries)
+	d.attr.Nlink = uint32(len(d.Entries))
 }
 
 func (d *Dir) RemoveChild(name string) {

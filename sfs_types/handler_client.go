@@ -1,4 +1,4 @@
-package types
+package sfs
 
 import (
 	"fmt"
@@ -24,10 +24,6 @@ func (p* PktFileCreate) Handle() {
 
 func (p* PktFileUpdate) Handle() {
 	fmt.Println("Handle FileUpdate")
-}
-
-func (p* PktFileDelete) Handle() {
-	fmt.Println("Handle FileDelete")
 }
 
 func (p* PktFileRequestChunk) Handle() {

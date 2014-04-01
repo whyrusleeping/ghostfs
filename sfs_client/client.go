@@ -7,7 +7,13 @@ import (
 	"os"
 	"bufio"
 	"strconv"
+	"encoding/gob"
 	"github.com/whyrusleeping/swagfs/sfs_types"
+	"flag"
+	"log"
+	"github.com/hanwen/go-fuse/fuse/pathfs"
+	//"github.com/hanwen/go-fuse/fuse"
+	"github.com/hanwen/go-fuse/fuse/nodefs"
 )
 
 func handshake(conn net.Conn) (int, error) {
@@ -27,7 +33,6 @@ func handshake(conn net.Conn) (int, error) {
 	return id, nil
 }
 
-var clients []types.Cclient
 var id int
 
 func main() {
@@ -46,6 +51,7 @@ func main() {
 		return
 	}
 
+	/*
 	fmt.Printf("%-30s", "Handshake...");
 	id, err = handshake(conn);
 	if err != nil	{
@@ -54,11 +60,43 @@ func main() {
 	}
 
 	fmt.Println("Id: ", id);
+	*/
 	fmt.Printf("[OK]\n");
 
+	//Make our filesystem structure
+	swag := MakeSwag()
+
+	//Use it to create a file system interface
+	nfs := pathfs.NewPathNodeFs(swag, nil)
+
+	//Mount our filesystem
+	server, _, err := nodefs.MountRoot(flag.Arg(0), nfs.Root(), nil)
+	if err != nil {
+		log.Fatalf("Mount fail: %s\n", err)
+	}
+	go server.Serve()
+
 	//Get and handle packets
+	gob.Register(sfs.DirInfoMessage{})
+	gob.Register(&sfs.EntryInfo{})
+	dec := gob.NewDecoder(conn)
+	var m sfs.Message
 	for {
-		types.GetPacket(conn)
+		fmt.Println("Wait for message...")
+		err := dec.Decode(&m)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(m)
+		switch m := m.(type) {
+			case sfs.DirInfoMessage:
+				fmt.Println("DirInfoMessage:")
+				for _,d := range m.Inf.Entries {
+					fmt.Println(d.Name)
+				}
+			default:
+				fmt.Println("Unknown Type.")
+		}
 	}
 }
 

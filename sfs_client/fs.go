@@ -34,15 +34,14 @@ func (fs *swagfs) GetEntry(path string) Entry {
 	return e
 }
 
-func (fs *swagfs) Access(path string, mode uint32, context *fuse.Context) (code fuse.Status) {
-	fmt.Println("Access was called!")
-	code = 0
-	return
+func (fs *swagfs) Access(path string, mode uint32, context *fuse.Context) fuse.Status {
+	return fuse.OK
 }
 //Require the 'name' to be the full path
 func (fs *swagfs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
 	fmt.Printf("calling get attr: %s\n", name)
 	if name == "" {
+		fmt.Println("Returning Empty.")
 		return &fuse.Attr{
 			Mode: fuse.S_IFDIR | 0755,
 		}, fuse.OK
@@ -52,7 +51,11 @@ func (fs *swagfs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.
 	if e == nil {
 		return nil, fuse.ENOENT
 	}
-	return e.Attr(), fuse.OK
+	fmt.Printf("Get Attr:")
+	fmt.Printf("%s: mode: %x size: %d uid: %d\n", e.Name(), e.Attr().Mode,
+		e.Attr().Size, e.Attr().Uid)
+	na := &fuse.Attr{Mode: e.Attr().Mode}
+	return na, fuse.OK
 }
 
 func (fs *swagfs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEntry, code fuse.Status) {
@@ -60,6 +63,7 @@ func (fs *swagfs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEntry
 	e := fs.GetEntry(name)
 	dir, ok := e.(*Dir)
 	if !ok {
+		fmt.Println("Failed to open dir...")
 		return nil, fuse.ENOENT
 	}
 

@@ -6,12 +6,13 @@ import (
 	"path"
 	"strings"
 	"github.com/whyrusleeping/swagfs/sfs_types"
+	"github.com/hanwen/go-fuse/fuse"
 )
 
 type Node struct {
 	Entries []*Node
-	Mode os.FileMode
 	Name string
+	Attr fuse.Attr
 }
 
 func (n *Node) Child(name string) *Node {
@@ -37,9 +38,9 @@ func (n *Node) Find(path string) *Node {
 
 func (n *Node) GetDirInfo() *sfs.DirInfo {
 	di := new(sfs.DirInfo)
-	di.Mode = n.Mode
+	di.Attr = n.Attr
 	for _,e := range n.Entries {
-		di.Entries = append(di.Entries, &sfs.EntryInfo{e.Name, e.Mode})
+		di.Entries = append(di.Entries, &sfs.EntryInfo{e.Name, e.Attr})
 	}
 	fmt.Printf("Dir Info: %d items\n", len(di.Entries))
 	return di
@@ -58,8 +59,8 @@ func (n *Node) BuildTree(rel string) error {
 	for _,e := range dinfo {
 		newn := new(Node)
 		newn.Name = e.Name()
-		newn.Mode = e.Mode()
-		fmt.Printf("Found: %s\n", e.Name())
+		newn.Attr = *fuse.ToAttr(e)
+		fmt.Printf("Found: %s, mode: %x\n", e.Name(), e.Mode())
 		if e.IsDir() {
 			newn.BuildTree(abs_path)
 		}

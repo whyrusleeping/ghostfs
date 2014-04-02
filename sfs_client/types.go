@@ -13,6 +13,8 @@ type Entry interface {
 	Name() string
 	Attr() *fuse.Attr
 	GetInfo() fuse.DirEntry
+
+	ncli *SfsCli
 }
 
 //Embeddable struct to ease of coding
@@ -22,16 +24,16 @@ type mEntry struct {
 }
 
 func MakeEntry(e *sfs.EntryInfo) Entry {
-	if (e.Mode & os.ModeDir) > 0 {
+	if (e.Attr.Mode & uint32(os.ModeDir)) > 0 {
 		d := new(Dir)
 		d.name = e.Name
 		d.Entries = make(map[string]Entry)
-		d.attr = &fuse.Attr{Mode: uint32(e.Mode)}
+		d.attr = &e.Attr
 		return d
 	}
 	f := new(File)
 	f.name = e.Name
-	f.attr = &fuse.Attr{Mode: uint32(e.Mode)}
+	f.attr = &e.Attr
 	return f
 }
 
@@ -39,6 +41,7 @@ func MakeEntry(e *sfs.EntryInfo) Entry {
 type Dir struct {
 	//Entries []Entry
 	Entries map[string]Entry
+	Loaded bool
 	mEntry
 }
 
@@ -89,6 +92,8 @@ func (d *Dir) GetEntry(toks []string) Entry {
 		//Was not a dir
 		return nil
 	}
+	if !sub.Loaded {
+	}
 	return sub.GetEntry(toks[1:])
 	/*
 	for _,e := range(d.Entries) {
@@ -111,7 +116,8 @@ func (d *Dir) GetEntry(toks []string) Entry {
 }
 
 func (d *Dir) GetInfo() fuse.DirEntry {
-	return fuse.DirEntry{Name: d.name, Mode: fuse.S_IFDIR}
+	fmt.Printf("Getinfo called, mode = %d\n", d.attr.Mode)
+	return fuse.DirEntry{Name: d.name, Mode: d.attr.Mode}
 }
 
 func (d *Dir) Name() string {
@@ -150,7 +156,8 @@ func (f *File) Attr() *fuse.Attr {
 }
 
 func (f *File) GetInfo() fuse.DirEntry {
-	return fuse.DirEntry{Name: f.name, Mode: fuse.S_IFREG}
+	fmt.Printf("Calling getinfo, mode= %d\n", f.attr.Mode)
+	return fuse.DirEntry{Name: f.name, Mode: f.attr.Mode}
 }
 
 //Link to a file or directory (or another link... interesting...)

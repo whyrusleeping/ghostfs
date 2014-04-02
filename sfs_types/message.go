@@ -1,17 +1,17 @@
 package sfs
 
 import (
-	"os"
+	"github.com/hanwen/go-fuse/fuse"
 )
 
 type EntryInfo struct {
 	Name string
-	Mode os.FileMode
+	Attr fuse.Attr
 }
 
 type DirInfo struct {
 	Entries []*EntryInfo
-	Mode os.FileMode
+	Attr fuse.Attr
 }
 
 type Message interface {

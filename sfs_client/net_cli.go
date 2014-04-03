@@ -10,18 +10,25 @@ import (
 	"log"
 )
 
-func init() {
-	fmt.Println("Initializing gob types.")
-	gob.Register(sfs.DirInfoMessage{})
-	gob.Register(&sfs.EntryInfo{})
-}
-
 type SfsCli struct {
+	Callbacks map[string]chan struct{}
+	Outgoing chan sfs.Message
+	Incoming chan sfs.Message
+	DirRequests chan *dirInfoCallback
 
+	Enc *gob.Encoder
+	Dec *gob.Decoder
+
+	ss *SwagSystem
 }
 
 type SwagSystem struct {
 	fs *swagfs
+}
+
+type dirInfoCallback struct {
+	Path string
+	Reply chan struct{}
 }
 
 
@@ -75,22 +82,50 @@ func (s *SfsCli) Start(host, mount string) error {
 			panic(err)
 		}
 		fmt.Println(m)
-		switch m := m.(type) {
-			case sfs.DirInfoMessage:
-				fmt.Println("DirInfoMessage:")
-				e := ss.fs.GetEntry(m.RelPath)
-				dir,ok := e.(*Dir)
-				if !ok {
-					fmt.Println("Recieved Dir info for non dir...")
-				} else {
-					for _,d := range m.Inf.Entries {
-						fmt.Println(d.Name)
-						dir.AddEntry(MakeEntry(d))
+		s.Incoming <- m
+	}
+}
+
+func (s *SfsCli) SyncChan() {
+	for {
+		select {
+		case dir := <-s.DirRequests:
+			s.Callbacks[dir.Path] = dir.Reply
+			drm := new(sfs.DirInfoRequest)
+			drm.Path = dir.Path
+			go func() {s.Outgoing <- drm}()
+		case out := <-s.Outgoing:
+			err := s.Enc.Encode(out)
+			if err != nil {
+				fmt.Println(err)
+			}
+		case in := <-s.Incoming:
+			switch m := in.(type) {
+				case sfs.DirInfoMessage:
+					fmt.Println("DirInfoMessage:")
+					e := s.ss.fs.GetEntry(m.RelPath)
+					dir,ok := e.(*Dir)
+					if !ok {
+						fmt.Println("Recieved Dir info for non dir...")
+					} else {
+						for _,d := range m.Inf.Entries {
+							fmt.Println(d.Name)
+							dir.AddEntry(MakeEntry(d))
+						}
+						dir.Loaded = true
 					}
-					dir.Loaded = true
-				}
-			default:
-				fmt.Println("Unknown Type.")
+				default:
+					fmt.Println("Unknown Type.")
+			}
 		}
 	}
+}
+
+func (s *SfsCli) RequestDirInfo(path string) {
+	resp := make(chan struct{})
+	dir := new(dirInfoCallback)
+	dir.Path = path
+	dir.Reply = resp
+	s.DirRequests <- dir
+	<-resp
 }

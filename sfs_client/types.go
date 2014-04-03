@@ -13,14 +13,17 @@ type Entry interface {
 	Name() string
 	Attr() *fuse.Attr
 	GetInfo() fuse.DirEntry
-
-	ncli *SfsCli
 }
 
 //Embeddable struct to ease of coding
 type mEntry struct {
 	attr *fuse.Attr
 	name string
+}
+
+type NotLoadedError struct {}
+func (n NotLoadedError) Error() string {
+	return "Tryed to access unloaded directory."
 }
 
 func MakeEntry(e *sfs.EntryInfo) Entry {
@@ -74,25 +77,26 @@ func (d *Dir) RemoveChild(name string) {
 	*/
 }
 
-func (d *Dir) GetEntry(toks []string) Entry {
+func (d *Dir) GetEntry(toks []string) (Entry,error) {
 	if len(toks) == 0 {
 		fmt.Println("returning self")
-		return d
+		return d,nil
 	}
 
 	e,ok := d.Entries[toks[0]]
 	if !ok {
-		return nil
+		return nil,nil
 	}
 	if len(toks) == 1 {
-		return e
+		return e,nil
 	}
 	sub, ok := e.(*Dir)
 	if !ok {
 		//Was not a dir
-		return nil
+		return nil,nil
 	}
 	if !sub.Loaded {
+		return nil,NotLoadedError{}
 	}
 	return sub.GetEntry(toks[1:])
 	/*

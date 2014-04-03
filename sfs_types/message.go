@@ -1,8 +1,16 @@
 package sfs
 
 import (
+	"encoding/gob"
+	
 	"github.com/hanwen/go-fuse/fuse"
 )
+
+func init() {
+	gob.Register(DirInfoMessage{})
+	gob.Register(&EntryInfo{})
+	gob.Register(&DirInfoRequest{})
+}
 
 type EntryInfo struct {
 	Name string
@@ -21,4 +29,8 @@ type Message interface {
 type DirInfoMessage struct {
 	Inf *DirInfo
 	RelPath string
+}
+
+type DirInfoRequest struct {
+	Path string
 }

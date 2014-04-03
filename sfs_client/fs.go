@@ -14,6 +14,8 @@ type swagfs struct {
 	pathfs.FileSystem
 	Root *Dir
 	cachedir string
+
+	ncli *SfsCli
 }
 
 func MakeSwag() *swagfs {
@@ -30,7 +32,10 @@ func (fs *swagfs) GetEntry(path string) Entry {
 	}
 	toks := strings.Split(path, "/")
 
-	e := fs.Root.GetEntry(toks)
+	e,err := fs.Root.GetEntry(toks)
+	if err != nil { //TODO: check which error, assume only one for now
+		fs.ncli.RequestDirInfo(path)
+	}
 	return e
 }
 

@@ -79,8 +79,6 @@ func main () {
 	}
 	rootpath := os.Args[1]
 	s := NewServer(rootpath)
-	gob.Register(sfs.DirInfoMessage{})
-	gob.Register(&sfs.EntryInfo{})
 	go s.SyncChan()
 	s.ServeSwag(":8080")
 }

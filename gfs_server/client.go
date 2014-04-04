@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"net"
 	"encoding/gob"
-	"github.com/whyrusleeping/swagfs/sfs_types"
+	"github.com/whyrusleeping/ghostfs/gfs_types"
 )
 
 type Client struct {
 	Con net.Conn
-	ServCom chan sfs.Message
-	OutGoing chan sfs.Message
+	ServCom chan gfs.Message
+	OutGoing chan gfs.Message
 
 	Dec *gob.Decoder
 	Enc *gob.Encoder
 }
 
-func (c *Client) SendMessage(m sfs.Message) {
+func (c *Client) SendMessage(m gfs.Message) {
 	fmt.Println("Sending:")
 	fmt.Println(m)
 	c.OutGoing <- m
@@ -25,7 +25,7 @@ func (c *Client) SendMessage(m sfs.Message) {
 func (c *Client) Start() {
 	go c.sync()
 
-	var m sfs.Message
+	var m gfs.Message
 	for {
 		err := c.Dec.Decode(m)
 		if err != nil {

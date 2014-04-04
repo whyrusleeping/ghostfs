@@ -5,7 +5,7 @@ import (
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 	"fmt"
-	"github.com/whyrusleeping/swagfs/sfs_types"
+	"github.com/whyrusleeping/ghostfs/gfs_types"
 )
 
 //Everything in our filesystem is an 'Entry'
@@ -26,7 +26,7 @@ func (n NotLoadedError) Error() string {
 	return "Tryed to access unloaded directory."
 }
 
-func MakeEntry(e *sfs.EntryInfo) Entry {
+func MakeEntry(e *gfs.EntryInfo) Entry {
 	if (e.Attr.Mode & uint32(os.ModeDir)) > 0 {
 		d := new(Dir)
 		d.name = e.Name

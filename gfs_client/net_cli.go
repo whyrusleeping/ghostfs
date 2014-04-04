@@ -6,14 +6,14 @@ import (
 	"encoding/gob"
 	"github.com/hanwen/go-fuse/fuse/pathfs"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
-	"github.com/whyrusleeping/swagfs/sfs_types"
+	"github.com/whyrusleeping/ghostfs/gfs_types"
 	"log"
 )
 
 type SfsCli struct {
 	Callbacks map[string]chan struct{}
-	Outgoing chan sfs.Message
-	Incoming chan sfs.Message
+	Outgoing chan gfs.Message
+	Incoming chan gfs.Message
 	DirRequests chan *dirInfoCallback
 
 	Enc *gob.Encoder
@@ -74,7 +74,7 @@ func (s *SfsCli) Start(host, mount string) error {
 
 	//Get and handle packets
 	dec := gob.NewDecoder(conn)
-	var m sfs.Message
+	var m gfs.Message
 	for {
 		fmt.Println("Wait for message...")
 		err := dec.Decode(&m)
@@ -91,7 +91,7 @@ func (s *SfsCli) SyncChan() {
 		select {
 		case dir := <-s.DirRequests:
 			s.Callbacks[dir.Path] = dir.Reply
-			drm := new(sfs.DirInfoRequest)
+			drm := new(gfs.DirInfoRequest)
 			drm.Path = dir.Path
 			go func() {s.Outgoing <- drm}()
 		case out := <-s.Outgoing:
@@ -101,7 +101,7 @@ func (s *SfsCli) SyncChan() {
 			}
 		case in := <-s.Incoming:
 			switch m := in.(type) {
-				case sfs.DirInfoMessage:
+				case gfs.DirInfoMessage:
 					fmt.Println("DirInfoMessage:")
 					e := s.ss.fs.GetEntry(m.RelPath)
 					dir,ok := e.(*Dir)

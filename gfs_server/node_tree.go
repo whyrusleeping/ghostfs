@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"path"
 	"strings"
-	"github.com/whyrusleeping/swagfs/sfs_types"
+	"github.com/whyrusleeping/ghostfs/gfs_types"
 	"github.com/hanwen/go-fuse/fuse"
 )
 
@@ -36,11 +36,11 @@ func (n *Node) Find(path string) *Node {
 	return cur
 }
 
-func (n *Node) GetDirInfo() *sfs.DirInfo {
-	di := new(sfs.DirInfo)
+func (n *Node) GetDirInfo() *gfs.DirInfo {
+	di := new(gfs.DirInfo)
 	di.Attr = n.Attr
 	for _,e := range n.Entries {
-		di.Entries = append(di.Entries, &sfs.EntryInfo{e.Name, e.Attr})
+		di.Entries = append(di.Entries, &gfs.EntryInfo{e.Name, e.Attr})
 	}
 	fmt.Printf("Dir Info: %d items\n", len(di.Entries))
 	return di

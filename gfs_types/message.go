@@ -1,4 +1,4 @@
-package sfs
+package gfs
 
 import (
 	"encoding/gob"

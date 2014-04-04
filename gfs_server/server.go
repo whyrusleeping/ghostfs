@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 	"encoding/gob"
-	"github.com/whyrusleeping/swagfs/sfs_types"
+	"github.com/whyrusleeping/ghostfs/gfs_types"
 )
 
 type SfsServer struct {
@@ -14,8 +14,8 @@ type SfsServer struct {
 	Clients []*Client
 
 	NewClients chan *Client
-	Broadcast chan sfs.Message
-	Incoming chan sfs.Message
+	Broadcast chan gfs.Message
+	Incoming chan gfs.Message
 }
 
 func NewServer(root string) *SfsServer {
@@ -23,7 +23,7 @@ func NewServer(root string) *SfsServer {
 	ss.Root = root
 	ss.TreeRoot = new(Node)
 	ss.TreeRoot.BuildTree(root)
-	ss.Incoming = make(chan sfs.Message)
+	ss.Incoming = make(chan gfs.Message)
 	return ss
 }
 
@@ -58,7 +58,7 @@ func (s *SfsServer) SyncChan() {
 func (s *SfsServer) AddClient(c net.Conn) {
 	cl := s.NewClient(c)
 	go cl.Start()
-	cl.SendMessage(&sfs.DirInfoMessage{s.TreeRoot.GetDirInfo(),""})
+	cl.SendMessage(&gfs.DirInfoMessage{s.TreeRoot.GetDirInfo(),""})
 	s.NewClients <- cl
 }
 
@@ -67,7 +67,7 @@ func (s *SfsServer) NewClient(c net.Conn) *Client {
 	cl.Con = c
 	cl.Dec = gob.NewDecoder(c)
 	cl.Enc = gob.NewEncoder(c)
-	cl.OutGoing = make(chan sfs.Message)
+	cl.OutGoing = make(chan gfs.Message)
 	cl.ServCom = s.Incoming
 	return cl
 }

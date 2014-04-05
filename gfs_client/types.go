@@ -36,6 +36,7 @@ func MakeEntry(e *gfs.EntryInfo) Entry {
 	}
 	fmt.Printf("%s is a file.\n", e.Name)
 	f := new(File)
+	f.FileData = new(GfsFile)
 	f.name = e.Name
 	f.attr = &e.Attr
 	return f

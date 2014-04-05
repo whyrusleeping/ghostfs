@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 	"fmt"
@@ -27,13 +26,15 @@ func (n NotLoadedError) Error() string {
 }
 
 func MakeEntry(e *gfs.EntryInfo) Entry {
-	if (e.Attr.Mode & uint32(os.ModeDir)) > 0 {
+	if e.Attr.IsDir() {
+		fmt.Printf("%s is a dir.\n", e.Name)
 		d := new(Dir)
 		d.name = e.Name
 		d.Entries = make(map[string]Entry)
 		d.attr = &e.Attr
 		return d
 	}
+	fmt.Printf("%s is a file.\n", e.Name)
 	f := new(File)
 	f.name = e.Name
 	f.attr = &e.Attr
@@ -53,6 +54,7 @@ func MakeDir(name string) *Dir {
 	d.name = name
 	d.attr = &fuse.Attr{Mode: fuse.S_IFDIR | 0755}
 	d.Entries = make(map[string]Entry)
+	d.Loaded = false
 	return d
 }
 
@@ -82,21 +84,31 @@ func (d *Dir) GetEntry(toks []string) (Entry,error) {
 		fmt.Println("returning self")
 		return d,nil
 	}
+	if d.Loaded == false {
+		return nil,NotLoadedError{}
+	}
 
 	e,ok := d.Entries[toks[0]]
 	if !ok {
+		fmt.Println("Not found.")
 		return nil,nil
 	}
 	if len(toks) == 1 {
+		if dir,ok := e.(*Dir); ok && !dir.Loaded {
+			fmt.Println("No loaded!")
+			return dir,NotLoadedError{}
+		}
 		return e,nil
 	}
 	sub, ok := e.(*Dir)
 	if !ok {
 		//Was not a dir
+		fmt.Println("Dir does not exist.")
 		return nil,nil
 	}
 	if !sub.Loaded {
-		return nil,NotLoadedError{}
+		fmt.Println("Unloaded dir...")
+		return sub,NotLoadedError{}
 	}
 	return sub.GetEntry(toks[1:])
 	/*
@@ -160,7 +172,7 @@ func (f *File) Attr() *fuse.Attr {
 }
 
 func (f *File) GetInfo() fuse.DirEntry {
-	fmt.Printf("Calling getinfo, mode= %d\n", f.attr.Mode)
+	//fmt.Printf("Calling getinfo, mode= %d\n", f.attr.Mode)
 	return fuse.DirEntry{Name: f.name, Mode: f.attr.Mode}
 }
 

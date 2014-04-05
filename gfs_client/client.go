@@ -37,7 +37,7 @@ func main() {
 		return
 	}
 
-	cli := new(SfsCli)
+	cli := NewGfsCli()
 	cli.Start(os.Args[1], os.Args[2])
 }
 

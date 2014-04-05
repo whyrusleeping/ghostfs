@@ -1,13 +1,14 @@
 package gfs
 
 import (
+	"fmt"
 	"encoding/gob"
-	
 	"github.com/hanwen/go-fuse/fuse"
 )
 
 func init() {
-	gob.Register(DirInfoMessage{})
+	fmt.Println("Registering gob types.")
+	gob.Register(&DirInfoMessage{})
 	gob.Register(&EntryInfo{})
 	gob.Register(&DirInfoRequest{})
 }

@@ -27,12 +27,15 @@ func (c *Client) Start() {
 
 	var m gfs.Message
 	for {
-		err := c.Dec.Decode(m)
+		err := c.Dec.Decode(&m)
+		fmt.Println("Got message from client.")
 		if err != nil {
 			fmt.Println("Client Read Loop:")
 			fmt.Println(err)
+			return
 		}
 		c.ServCom <- m
+		fmt.Println("Message relayed to server.")
 	}
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"reflect"
 	"os"
 	"encoding/gob"
 	"github.com/whyrusleeping/ghostfs/gfs_types"
@@ -24,6 +25,8 @@ func NewServer(root string) *SfsServer {
 	ss.TreeRoot = new(Node)
 	ss.TreeRoot.BuildTree(root)
 	ss.Incoming = make(chan gfs.Message)
+	ss.NewClients = make(chan *Client)
+	ss.Broadcast = make(chan gfs.Message)
 	return ss
 }
 
@@ -50,6 +53,19 @@ func (s *SfsServer) SyncChan() {
 			case mes := <-s.Broadcast:
 				for _,c := range s.Clients {
 					c.OutGoing <-mes
+				}
+			case in := <-s.Incoming:
+				switch in := in.(type) {
+					case *gfs.DirInfoRequest:
+						fmt.Printf("dir requested: %s\n", in.Path)
+						ent := s.TreeRoot.Find(in.Path)
+						go func() {
+							s.Broadcast <- &gfs.DirInfoMessage{ent.GetDirInfo(),in.Path}
+							fmt.Println("Broadcasted dirinfo message.")
+						}()
+					default:
+						fmt.Println("Unrecognized message type...")
+						fmt.Println(reflect.TypeOf(in))
 				}
 		}
 	}

@@ -10,7 +10,7 @@ import (
 	"log"
 )
 
-type SfsCli struct {
+type GfsCli struct {
 	Callbacks map[string]chan struct{}
 	Outgoing chan gfs.Message
 	Incoming chan gfs.Message
@@ -32,9 +32,9 @@ type dirInfoCallback struct {
 }
 
 
-func (ss *SwagSystem) BuildAndMount(mountpoint string) error {
+func (ss *SwagSystem) BuildAndMount(mountpoint string, cli *GfsCli) error {
 	//Make our filesystem structure
-	swag := MakeSwag()
+	swag := MakeSwag(cli)
 	ss.fs = swag
 
 	//Use it to create a file system interface
@@ -50,7 +50,16 @@ func (ss *SwagSystem) BuildAndMount(mountpoint string) error {
 	return nil
 }
 
-func (s *SfsCli) Start(host, mount string) error {
+func NewGfsCli() *GfsCli {
+	s := new(GfsCli)
+	s.Callbacks = make(map[string]chan struct{})
+	s.Incoming = make(chan gfs.Message)
+	s.Outgoing = make(chan gfs.Message)
+	s.DirRequests = make(chan *dirInfoCallback)
+	return s
+}
+
+func (s *GfsCli) Start(host, mount string) error {
 	conn, err := net.Dial("tcp", host)
 	if err != nil {
 		fmt.Println("Connection to server failed. Exiting...")
@@ -70,49 +79,74 @@ func (s *SfsCli) Start(host, mount string) error {
 	fmt.Printf("[OK]\n");
 
 	ss := new(SwagSystem)
-	ss.BuildAndMount(mount)
+	ss.BuildAndMount(mount, s)
+	s.ss = ss
 
 	//Get and handle packets
 	dec := gob.NewDecoder(conn)
+	s.Enc = gob.NewEncoder(conn)
 	var m gfs.Message
+	go s.SyncChan()
 	for {
 		fmt.Println("Wait for message...")
 		err := dec.Decode(&m)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(m)
+		fmt.Println("Got message...")
+		//fmt.Println(m)
 		s.Incoming <- m
 	}
 }
 
-func (s *SfsCli) SyncChan() {
+func (s *GfsCli) SyncChan() {
 	for {
 		select {
 		case dir := <-s.DirRequests:
+			fmt.Printf("Processing request for: %s\n", dir.Path)
 			s.Callbacks[dir.Path] = dir.Reply
 			drm := new(gfs.DirInfoRequest)
 			drm.Path = dir.Path
-			go func() {s.Outgoing <- drm}()
+			go func() {
+				s.Outgoing <- drm
+				fmt.Println("Placed request on outgoing queue.")
+			}()
 		case out := <-s.Outgoing:
-			err := s.Enc.Encode(out)
+			fmt.Println("Sending message to server...")
+			err := s.Enc.Encode(&out)
 			if err != nil {
 				fmt.Println(err)
 			}
 		case in := <-s.Incoming:
 			switch m := in.(type) {
-				case gfs.DirInfoMessage:
-					fmt.Println("DirInfoMessage:")
-					e := s.ss.fs.GetEntry(m.RelPath)
+				case *gfs.DirInfoMessage:
+					fmt.Printf("DirInfoMessage: '%s'\n", m.RelPath)
+					e := s.ss.fs.GetEntry(m.RelPath, false)
+					if e == nil {
+						fmt.Println("Nil entry returned...")
+					}
 					dir,ok := e.(*Dir)
 					if !ok {
 						fmt.Println("Recieved Dir info for non dir...")
 					} else {
 						for _,d := range m.Inf.Entries {
-							fmt.Println(d.Name)
+							//fmt.Println(d.Name)
 							dir.AddEntry(MakeEntry(d))
 						}
 						dir.Loaded = true
+
+						//If someone was waiting on this info, tell them
+						resp,ok := s.Callbacks[m.RelPath]
+						if ok {
+							if resp == nil {
+								fmt.Printf("Nil channel for path: %s\n", m.RelPath)
+							}
+							delete(s.Callbacks, m.RelPath)
+							fmt.Println("Replying to callback!")
+							go func() {
+								resp <- struct{}{}
+							}()
+						}
 					}
 				default:
 					fmt.Println("Unknown Type.")
@@ -121,11 +155,13 @@ func (s *SfsCli) SyncChan() {
 	}
 }
 
-func (s *SfsCli) RequestDirInfo(path string) {
+func (s *GfsCli) RequestDirInfo(path string) {
+	fmt.Printf("Requesting: %s\n", path)
 	resp := make(chan struct{})
 	dir := new(dirInfoCallback)
 	dir.Path = path
 	dir.Reply = resp
 	s.DirRequests <- dir
 	<-resp
+	fmt.Printf("Request for '%s' completed!\n", path)
 }

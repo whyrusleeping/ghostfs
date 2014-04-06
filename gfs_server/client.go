@@ -34,6 +34,7 @@ func (c *Client) Start() {
 			fmt.Println(err)
 			return
 		}
+		m.SetCallback(c.OutGoing)
 		c.ServCom <- m
 		fmt.Println("Message relayed to server.")
 	}

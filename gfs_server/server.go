@@ -7,6 +7,7 @@ import (
 	"os"
 	"encoding/gob"
 	"github.com/whyrusleeping/ghostfs/gfs_types"
+	"crypto/md5"
 )
 
 type SfsServer struct {
@@ -45,6 +46,33 @@ func (s *SfsServer) ServeSwag(addr string) {
 	}
 }
 
+func HandleFileDataRequest(fdr *gfs.FileDataRequest) {
+	fi,err := os.Open(fdr.Path)
+	resp := new(gfs.FileDataResponse)
+	defer func() {
+		fi.Close()
+		fdr.GetCallback() <- resp
+	}()
+	if err != nil {
+		resp.Error = err.Error()
+		return
+	}
+	_,err = fi.Seek(fdr.Offset, os.SEEK_SET)
+	if err != nil {
+		resp.Error = err.Error()
+		return
+	}
+	data := make([]byte, fdr.Size)
+	_,err = fi.Read(data)
+	if err != nil {
+		resp.Error = err.Error()
+		return
+	}
+	resp.Path = fdr.Path
+	resp.Data = data
+	resp.Hash = md5.Sum(data)
+}
+
 func (s *SfsServer) SyncChan() {
 	for {
 		select {
@@ -60,9 +88,14 @@ func (s *SfsServer) SyncChan() {
 						fmt.Printf("dir requested: %s\n", in.Path)
 						ent := s.TreeRoot.Find(in.Path)
 						go func() {
-							s.Broadcast <- &gfs.DirInfoMessage{ent.GetDirInfo(),in.Path}
+							dim := new(gfs.DirInfoMessage)
+							dim.Inf = ent.GetDirInfo()
+							dim.RelPath = in.Path
+							s.Broadcast <- dim
 							fmt.Println("Broadcasted dirinfo message.")
 						}()
+					case *gfs.FileDataRequest:
+						go HandleFileDataRequest(in)
 					default:
 						fmt.Println("Unrecognized message type...")
 						fmt.Println(reflect.TypeOf(in))
@@ -74,7 +107,10 @@ func (s *SfsServer) SyncChan() {
 func (s *SfsServer) AddClient(c net.Conn) {
 	cl := s.NewClient(c)
 	go cl.Start()
-	cl.SendMessage(&gfs.DirInfoMessage{s.TreeRoot.GetDirInfo(),""})
+	rootinf := new(gfs.DirInfoMessage)
+	rootinf.Inf = s.TreeRoot.GetDirInfo()
+	rootinf.RelPath = ""
+	cl.SendMessage(rootinf)
 	s.NewClients <- cl
 }
 

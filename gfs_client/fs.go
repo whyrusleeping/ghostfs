@@ -105,8 +105,7 @@ func (fs *swagfs) Open(name string, flags uint32, context *fuse.Context) (file n
 	if !ok {
 		return nil, fuse.ENOENT
 	}
-	fi.name = "john"
-	return nodefs.NewDataFile([]byte(name)), fuse.OK
+	return fi.FileData, fuse.OK
 }
 
 func (fs *swagfs) Utimens(name string, Atime *time.Time, Mtime *time.Time, context *fuse.Context) fuse.Status {

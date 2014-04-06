@@ -165,3 +165,7 @@ func (s *GfsCli) RequestDirInfo(path string) {
 	<-resp
 	fmt.Printf("Request for '%s' completed!\n", path)
 }
+
+func (s *GfsCli) RequestFileData(path string, cid int, reply chan *FileChunk) {
+	
+}
